@@ -8,17 +8,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Payments', href: '/payments' },
 ];
 
+interface Payment {
+    id: number;
+    customer_name: string;
+    currency: string;
+    payment_date: string;
+    amount: number;
+    usd_amount: number;
+    is_processed: boolean;
+}
+
 export default function Payments() {
-    const [payments, setPayments] = useState<any[]>([]);
+    const [payments, setPayments] = useState<Payment[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPayments = async () => {
             try {
                 const response = await axios.get('/api/payments');
-                console.log('Full API Response:', response.data);
+                console.log('API Response:', response.data);
 
-                // The actual payments array is here:
                 const paymentsArray = response.data.data?.data || [];
                 setPayments(paymentsArray);
             } catch (err) {
