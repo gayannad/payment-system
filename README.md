@@ -13,7 +13,7 @@ Laravel + React payment file processing system.
 
 1. **Clone and install**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/gayannad/payment-system.git
    cd payment-system
    composer install
    npm install
