@@ -41,7 +41,7 @@ Laravel + React payment file processing system.
 
 4. **Run migrations**
    ```bash
-   php artisan migrate
+   php artisan migrate --seed
    ```
 
 ## Usage
