@@ -20,7 +20,6 @@ class PaymentRepository implements PaymentRepositoryInterface
     public function all(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
     {
         return $this->model
-            ->with(['invoice'])
             ->select([
                 'id',
                 'customer_name',

@@ -15,10 +15,10 @@ class Invoice extends Model
         'is_sent',
     ];
 
-    protected $casts = [
-        'is_sent' => 'boolean',
-        'amount' => 'decimal:2',
-    ];
+    //    protected $casts = [
+    //        'is_sent' => 'boolean',
+    //        'amount' => 'decimal:2',
+    //    ];
 
     public function payments(): HasMany
     {

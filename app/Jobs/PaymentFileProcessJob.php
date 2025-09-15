@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\LazyCollection;
 
 class PaymentFileProcessJob implements ShouldQueue
 {
@@ -32,17 +33,35 @@ class PaymentFileProcessJob implements ShouldQueue
     public function handle(PaymentProcessService $paymentProcessService): void
     {
         try {
-            $file = Storage::disk('s3')->get($this->filePath);
-            $lines = explode("\n", $file);
-            $headers = str_getcsv(array_shift($lines));
+            $stream = Storage::disk('s3')->readStream($this->filePath);
 
-            foreach ($lines as $index => $line) {
-                if (trim($line) === '') {
-                    continue;
+            LazyCollection::make(function () use ($stream) {
+                while (($line = fgets($stream)) !== false) {
+                    yield trim($line);
                 }
-                $rowData = array_combine($headers, str_getcsv($line));
-                $paymentProcessService->processPayment($rowData, $index + 2, $this->fileName);
-            }
+                fclose($stream);
+            })
+                ->filter(fn ($line) => ! empty($line))
+                ->chunk(1000)
+                ->each(function ($chunk, $chunkIndex) use ($paymentProcessService) {
+                    $headers = null;
+
+                    foreach ($chunk as $lineIndex => $line) {
+                        $rowNumber = ($chunkIndex * 1000) + $lineIndex + 1;
+
+                        if ($rowNumber === 1) {
+                            $headers = str_getcsv($line);
+
+                            continue;
+                        }
+
+                        if ($headers) {
+                            $rowData = array_combine($headers, str_getcsv($line));
+                            $paymentProcessService->processPayment($rowData, $rowNumber + 1, $this->fileName);
+                        }
+                    }
+                });
+
         } catch (\Exception $e) {
             logger()->error('Payment file processing failed', [
                 'file' => $this->fileName,

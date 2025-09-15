@@ -5,13 +5,13 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class InvoiceTest extends TestCase
+class PaymentTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_index_returns_invoices()
+    public function test_index_returns_payments()
     {
-        $response = $this->getJson('/api/invoices');
+        $response = $this->getJson('/api/payments');
 
         $response->assertStatus(200);
 
@@ -23,10 +23,12 @@ class InvoiceTest extends TestCase
                 'data' => [
                     '*' => [
                         'id',
-                        'invoice_number',
                         'customer_name',
                         'amount',
-                        'is_sent',
+                        'usd_amount',
+                        'currency',
+                        'payment_date',
+                        'is_processed',
                         'created_at',
                     ],
                 ],
@@ -52,7 +54,7 @@ class InvoiceTest extends TestCase
         ])
             ->assertJson([
                 'success' => true,
-                'message' => 'Invoices retrieved successfully.',
+                'message' => 'Payments retrieved successfully.',
             ]);
 
         $this->assertIsInt($response->json('data.current_page'));

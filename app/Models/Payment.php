@@ -23,6 +23,7 @@ class Payment extends Model
 
     protected $casts = [
         'payment_date' => 'date',
+        'created_at' => 'date',
         'is_processed' => 'boolean',
         'amount' => 'decimal:2',
         'usd_amount' => 'decimal:2',
