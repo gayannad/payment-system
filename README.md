@@ -66,3 +66,8 @@ Laravel + React payment file processing system.
 4. **Access API Doc**
   - http://localhost:8000/docs/api
 
+5. **Default Login**
+   - URL: http://localhost:8000
+   - Email: test@example.com
+   - Password: password
+
