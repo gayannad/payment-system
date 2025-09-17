@@ -19,15 +19,13 @@ class ExchangeRateService
     /**
      * Retrieves the USD exchange rate for a given currency
      */
-    public function getUSDRate(): int
+    public function getUSDRate($currency): float
     {
-        $currency = 'EUR';
-
         if ($currency === 'USD') {
-            return 1;
+            return 1.0;
         }
 
-        $cacheKey = 'usd_rate_'.$currency.time();
+        $cacheKey = 'usd_rate_'.$currency;
 
         return cache()->remember($cacheKey, 3600, function () use ($currency) {
             try {
@@ -41,7 +39,7 @@ class ExchangeRateService
                 if ($response->successful()) {
                     $data = $response->json();
 
-                    return $data['rates']['USD'] ?? null;
+                    return (float) $data['rates']['USD'];
                 }
                 throw new \Exception('Failed to fetch exchange rate');
             } catch (\Exception $e) {
@@ -60,8 +58,12 @@ class ExchangeRateService
             return $amount;
         }
 
-        $rate = $this->getUSDRate();
-
-        return $amount * $rate;
+        try {
+            $rate = $this->getUSDRate($currency);
+            return $amount * $rate;
+        } catch (\Exception $e) {
+            logger()->error('Error usd rate: ' . $e->getMessage());
+            return 0;
+        }
     }
 }

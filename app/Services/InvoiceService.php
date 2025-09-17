@@ -67,8 +67,4 @@ class InvoiceService
 
     }
 
-    //    public function generateInvoiceHTML($invoice, $payments)
-    //    {
-    //        return view('emails.invoice', compact('invoice', 'payments'))->render();
-    //    }
 }
